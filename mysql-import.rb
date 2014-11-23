@@ -3,8 +3,12 @@
 require "optparse"
 require "date"
 require "active_support/all"
+require "pry"
 
 class Name
+end
+
+class Ignore
 end
 
 options = {
@@ -47,11 +51,16 @@ lines.map! do |line|
   end
 end
 
-field_names = options[:fields].keys
+field_names = options[:fields].select do |k, v|
+  v != Ignore
+end.keys
+
 mappers = options[:fields].values
 
 def map_component(component, i, mappers)
-  if mappers[i] == Float
+  if mappers[i].is_a?(Proc)
+    mappers[i].call(component)
+  elsif mappers[i] == Float
     component.to_f
   elsif mappers[i] == Integer
     component.to_i
@@ -63,6 +72,8 @@ def map_component(component, i, mappers)
     "'#{Time.parse(component).to_s(:db).split("\s")[1]}'"
   elsif mappers[i] == String
     "'#{component}'"
+  else
+    "IGNORE"
   end
 end
 
@@ -70,6 +81,8 @@ lines.map! do |line|
   line.each_with_index do |component, i|
     line[i] = map_component(component, i, mappers)
   end
+
+  line.reject! { |component| component == "IGNORE" }
 
   line
 end
