@@ -1,0 +1,12 @@
+START TRANSACTION;
+USE CSU;
+SET FOREIGN_KEY_CHECKS=0;
+DROP TABLE campus_fees;
+DROP TABLE campuses;
+DROP TABLE degrees;
+DROP TABLE discipline_enrollments;
+DROP TABLE disciplines;
+DROP TABLE enrollments;
+DROP TABLE faculty;
+SET FOREIGN_KEY_CHECKS=1;
+COMMIT;
